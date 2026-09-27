@@ -5,7 +5,7 @@ let draft={people:2,date:today(),time:'',first:'',last:'',phone:'',notes:''}, st
 const $=s=>document.querySelector(s);
 const notify=text=>{const t=$('#toast');t.textContent=text;t.style.display='block';setTimeout(()=>t.style.display='none',3500)};
 const options=(items,val)=>items.map(x=>`<option value="${esc(x)}" ${String(x)===String(val)?'selected':''}>${esc(x)}</option>`).join('');
-const peopleOptions=v=>Array.from({length:12},(_,i)=>`<option value="${i+1}" ${i+1===Number(v)?'selected':''}>${i+1} ${i?'persone':'persona'}</option>`).join('');
+const peopleOptions=v=>Array.from({length:30},(_,i)=>`<option value="${i+1}" ${i+1===Number(v)?'selected':''}>${i+1} ${i?'persone':'persona'}</option>`).join('');
 function summary(b){return `<div class="summary"><strong>${esc(formatDate(b.date))}</strong><p>${esc(b.time)} · ${Number(b.people)} ${Number(b.people)===1?'persona':'persone'}</p>${b.first?`<p>${esc(b.first)} ${esc(b.last)}</p><p>${esc(b.phone)}</p>`:''}${b.notes?`<p>Note: ${esc(b.notes)}</p>`:''}</div>`}
 function route(path){history.pushState({},'',path);render();window.scrollTo(0,0)}
 function render(){if(location.pathname.startsWith('/admin'))admin();else if(location.pathname==='/conferma')receipt();else booking()}

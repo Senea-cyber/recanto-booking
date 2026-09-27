@@ -11,7 +11,7 @@ Demo statica mobile-first per Recanto Brasil. Nessuna integrazione esterna attiv
 Aprire la pagina pubblica, scegliere una data futura e un orario, inserire un nome fittizio e `0001234567`, confermare. Aprire `/admin` nello stesso browser e selezionare la stessa data. Provare modifica, cambio stato e cancellazione. Sei prenotazioni fittizie sono create alla prima apertura per il giorno corrente.
 
 ## Limiti espliciti della demo
-Dati in localStorage, separati per origine/browser/dispositivo; nessun database condiviso o autenticazione. `/admin` non è riservato. Non inserire dati personali reali. Disponibilità dimostrativa: 40 coperti contemporanei, durata 120 minuti, massimo 12 persone per prenotazione, fuso Europe/Rome. Nessuna garanzia di atomicità tra più schede: per l'uso reale occorre un backend transazionale.
+Dati in localStorage, separati per origine/browser/dispositivo; nessun database condiviso o autenticazione. `/admin` non è riservato. Non inserire dati personali reali. Disponibilità dimostrativa: 40 coperti contemporanei, durata 120 minuti, massimo 30 persone per prenotazione, fuso Europe/Rome. Nessuna garanzia di atomicità tra più schede: per l'uso reale occorre un backend transazionale.
 
 ## Pubblicazione Vercel
 Repository nuovo `recanto-booking`, framework preset Other, root directory del progetto, nessun comando build, output directory `.`. `vercel.json` gestisce i percorsi e gli header. Nessun dominio da acquistare, nessuna dipendenza di runtime. La disponibilità del dominio `recanto-booking.vercel.app` deve essere verificata da Vercel.
