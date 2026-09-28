@@ -29,3 +29,6 @@ Vedi STUDIO-FUNZIONALE.md per fonti, corrispondenze, limiti e prove. Agenda per 
 
 ## Giorni e orari di apertura
 In Admin → Impostazioni si configurano i sette giorni, con apertura/chiusura giornaliera e pranzo/cena indipendenti. Primo e ultimo arrivo prenotabile sono inclusi, con passo di 15 minuti. La demo distingue pranzo prima delle 17:00 e cena dalle 17:00; non gestisce arrivi oltre mezzanotte. Le prenotazioni esistenti restano visibili e modificabili. Le chiusure straordinarie per data prevalgono sul calendario. Il personale può inserire manualmente eccezioni agli orari (sempre entro i limiti di capienza e tavoli). I dati e il calendario restano locali al browser.
+
+## Sale e tavoli configurabili
+Admin → Impostazioni → Sale, tavoli e posti: aggiunta/rinomina/rimozione sale, inserimento di più tavoli con posti predefiniti, nome e posti modificabili per tavolo. Le identità dei tavoli sono stabili anche rinominandoli. Il salvataggio aggiorna la capienza alla somma dei posti; il limite può poi essere ridotto nelle impostazioni generali. Rimozione di tavoli assegnati oggi o in futuro e riduzioni incompatibili con le prenotazioni attive vengono rifiutate. I dati storici vengono conservati. La vista sale è uno schema, senza posizionamento grafico dei tavoli.
