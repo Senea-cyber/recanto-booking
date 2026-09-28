@@ -26,3 +26,6 @@ Repository nuovo `recanto-booking`, framework preset Other, root directory del p
 
 ## Simulazione gestione sala v2
 Vedi STUDIO-FUNZIONALE.md per fonti, corrispondenze, limiti e prove. Agenda per servizi, intervalli 15 minuti, tavoli demo, arrivi parziali, note interne, storico cliente, registro notifiche, chiusura online. I dati esistenti sono conservati e completati con valori predefiniti. Per uno scenario pieno, scegliere una data vuota e usare Carica scenario da 130 coperti.
+
+## Giorni e orari di apertura
+In Admin → Impostazioni si configurano i sette giorni, con apertura/chiusura giornaliera e pranzo/cena indipendenti. Primo e ultimo arrivo prenotabile sono inclusi, con passo di 15 minuti. La demo distingue pranzo prima delle 17:00 e cena dalle 17:00; non gestisce arrivi oltre mezzanotte. Le prenotazioni esistenti restano visibili e modificabili. Le chiusure straordinarie per data prevalgono sul calendario. Il personale può inserire manualmente eccezioni agli orari (sempre entro i limiti di capienza e tavoli). I dati e il calendario restano locali al browser.
