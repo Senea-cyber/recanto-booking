@@ -1,6 +1,8 @@
 // Demo repository. Production needs authenticated APIs and transactional storage.
 export const integrations=Object.freeze({whatsapp:{enabled:false},googleBusinessProfile:{enabled:false},facebook:{enabled:false},instagram:{enabled:false}});
 export const slots=[...Array.from({length:9},(_,i)=>clock(720+i*15)),...Array.from({length:13},(_,i)=>clock(1140+i*15))];
+export const channelNames=Object.freeze({facebook:'Facebook',instagram:'Instagram',google:'Google',maps:'Google Maps'});
+export function bookingChannel(search=''){const value=new URLSearchParams(search).get('src')?.toLowerCase();return Object.hasOwn(channelNames,value)?value:'direct'}
 export const statuses=['prenotato','confermato','riconfermato','arrivo parziale','arrivato','uscito','no-show','cancellato'];
 export const tables=Array.from({length:25},(_,i)=>({id:'T'+(i+1),seats:i<20?4:10,room:i<15?'Sala principale':'Seconda sala'}));
 export const weekdays=['Domenica','Lunedì','Martedì','Mercoledì','Giovedì','Venerdì','Sabato'];

@@ -32,3 +32,11 @@ In Admin → Impostazioni si configurano i sette giorni, con apertura/chiusura g
 
 ## Sale e tavoli configurabili
 Admin → Impostazioni → Sale, tavoli e posti: aggiunta/rinomina/rimozione sale, inserimento di più tavoli con posti predefiniti, nome e posti modificabili per tavolo. Le identità dei tavoli sono stabili anche rinominandoli. Il salvataggio aggiorna la capienza alla somma dei posti; il limite può poi essere ridotto nelle impostazioni generali. Rimozione di tavoli assegnati oggi o in futuro e riduzioni incompatibili con le prenotazioni attive vengono rifiutate. I dati storici vengono conservati. La vista sale è uno schema, senza posizionamento grafico dei tavoli.
+
+## Link per canale, solo per prove
+- Facebook: `https://recanto-booking.vercel.app/?src=facebook`
+- Instagram: `https://recanto-booking.vercel.app/?src=instagram`
+- Google Business Profile: `https://recanto-booking.vercel.app/?src=google`
+- Google Maps: `https://recanto-booking.vercel.app/?src=maps`
+
+La scheda admin indica il canale di provenienza per le nuove prenotazioni demo. I parametri arbitrari sono ignorati. Questi link NON vanno ancora pubblicati sui profili reali: l'archivio è nel browser del cliente, l'admin non è protetto e nessun ristorante riceve la prenotazione. Prima della distribuzione occorrono archivio condiviso, controllo capienza sul server, area admin autenticata, informativa privacy e verifica completa. I pulsanti delle piattaforme si configurano nei profili della sede con accesso autorizzato; la presenza del link non implica l'integrazione partner “Prenota con Google” o il pulsante “Prenota” di Instagram.
