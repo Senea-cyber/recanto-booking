@@ -24,7 +24,7 @@ Sito: https://recanto-booking.vercel.app/admin
 
 ## Test
 - `npm test`: regole originali di disponibilità, tavoli, calendario, capienza e canali.
-- `npm run test:integration`: database PostgreSQL dedicato **esclusivamente ai test**. Impostare DATABASE_URL; il test svuota le tabelle recanto_* del database indicato. Non eseguire su database production o preview con dati da conservare.
+- `npm run test:integration`: database PostgreSQL dedicato **esclusivamente ai test**. Il test accetta solo il database recanto_test su localhost/127.0.0.1; svuota le tabelle recanto_* del database indicato. Non eseguire su database production o preview con dati da conservare.
 - `TEST_PASSWORD=... node test/browser.mjs`: Playwright 1.56.1 installato separatamente, ambiente test isolato. Verifica login, impostazioni, attesa/promozione, cancellazione, logout, prenotazione online, Instagram, schema sale e larghezza mobile. Il test modifica dati: non usarlo in produzione.
 - `server/dev.mjs` è esclusivamente un server per test in cloud, mai il server di produzione.
 

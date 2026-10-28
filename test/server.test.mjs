@@ -6,7 +6,8 @@ import {readState,mutate,availability} from '../server/service.js';
 import {hashPassword,verifyPassword} from '../server/auth.js';
 import handler from '../api/booking.js';
 process.env.NODE_ENV='test';
-process.env.DATABASE_URL ||= 'postgresql://vercel-sandbox@127.0.0.1:55432/postgres';
+process.env.DATABASE_URL ||= 'postgresql://vercel-sandbox@127.0.0.1:55432/recanto_test';
+const target=new URL(process.env.DATABASE_URL);if(!['localhost','127.0.0.1'].includes(target.hostname)||target.pathname!=='/recanto_test')throw Error('Test reset allowed only on the isolated localhost recanto_test database.');
 const date='2030-12-20';
 const data={first:'Test',last:'Cliente',phone:'0001234567',people:1,date,time:'19:00',origin:'instagram'};
 async function api(method,body,headers={},query=''){let status=200,result,hs={};const req={method,url:'/api/booking'+query,body,headers:{host:'localhost','content-type':'application/json',origin:'http://localhost',...headers},socket:{remoteAddress:'test'}};const res={setHeader(k,v){hs[k]=v},status(s){status=s;return this},json(v){result=v;return this}};await handler(req,res);return {status,body:result,headers:hs};}
