@@ -1,0 +1,1 @@
+import fs from 'node:fs';fs.mkdirSync('public',{recursive:true});for(const p of ['app.js','booking.js','manager.js','remote-store.js','index.html','style.css'])fs.copyFileSync(p,'public/'+p);
