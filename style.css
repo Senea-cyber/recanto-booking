@@ -11,3 +11,17 @@
 .floor-layout{display:grid;grid-template-columns:minmax(0,1fr) 280px;gap:16px}.floor-scroll{overflow:auto;border-radius:12px}#room-canvas{width:100%;min-width:700px;display:block;touch-action:none}.table-marker{cursor:pointer}.table-marker:focus{outline:none}.table-marker:focus rect{stroke:#bc3f35;stroke-width:5}.floor-tools{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:12px 0}.floor-tools p{width:100%}.floor-guest{padding:12px 0;border-bottom:1px solid #ddd}.floor-guest button{margin-top:6px}#floor-unassigned button{margin:4px}@media(max-width:850px){.floor-layout{grid-template-columns:1fr}#room-canvas{min-width:600px}.floor-heading{flex-wrap:wrap}}
 
 .super-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}@media(max-width:800px){.super-grid{grid-template-columns:1fr}}#customer-list details{margin-bottom:10px}#customer-list summary{cursor:pointer}
+
+/* Operator overview and adaptive table editor */
+.floor-overview{display:grid;grid-template-columns:minmax(0,1fr) 280px;gap:18px;align-items:start}
+.room-maps{min-width:0;display:grid;gap:18px}.room-maps.all-rooms{grid-template-columns:repeat(2,minmax(0,1fr))}
+.room-map{min-width:0;background:#fff;border:1px solid #dce5dc;border-radius:14px;padding:12px}
+.room-map-title{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:10px}.room-map-title h3{margin:0;flex:1}.room-map-title span{width:100%;font-size:13px;color:#53675a;order:3}
+.room-map svg{display:block;width:100%;min-width:420px;touch-action:none}.room-map .floor-scroll{overflow:auto}
+.floor-legend{display:flex;flex-wrap:wrap;gap:18px;font-size:14px;margin:12px 0}.floor-legend .expected{color:#8d620e}.floor-legend .seated{color:#175d46}.floor-legend .found{color:#c22d33}
+.floor-match{display:block;margin:8px 0;text-align:left}.resize-handle{cursor:nwse-resize}.table-marker:focus{outline:none}.table-marker:focus [data-table-body]{stroke:#c22d33;stroke-width:6}
+#floor-detail{position:sticky;top:12px;max-height:calc(100vh - 110px);overflow:auto}
+@media(max-width:1200px){.floor-overview{grid-template-columns:minmax(0,1fr)}#floor-detail{position:static;max-height:none}.room-maps.all-rooms{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:700px){.room-maps.all-rooms{grid-template-columns:1fr}.room-map{padding:8px}.room-map svg{min-width:540px}.floor-tools .field{width:100%}}
+
+.floor-overview:has(.all-rooms){grid-template-columns:minmax(0,1fr)}.floor-overview:has(.all-rooms) #floor-detail{position:static;max-height:none}.room-maps.all-rooms svg{min-width:0}@media(max-width:700px){.room-maps.all-rooms svg{min-width:540px}}

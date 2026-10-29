@@ -1,3 +1,4 @@
+import {layoutForDate,capacityForDate} from './booking.js';
 export async function request(body,query=''){
 const params=new URLSearchParams(query);const restaurant=body?.restaurant||new URLSearchParams(location.search).get('restaurant');if(restaurant&&!params.has('restaurant'))params.set('restaurant',restaurant);
 const r=await fetch('/api/booking?'+params,{method:body?'POST':'GET',credentials:'same-origin',cache:'no-store',headers:body?{'Content-Type':'application/json'}:{},body:body?JSON.stringify(body):undefined});
@@ -6,8 +7,8 @@ export class RemoteStore{
 constructor(){this.state=null;this.busy=false;}
 async refresh(){this.state=await request(null,'?action=state');}
 list(){return this.state.bookings;}
-settings(){return this.state.settings;}
-layout(){return this.state.layout;}
+settings(date){return date?{...this.state.settings,capacity:capacityForDate(this.state.layout,this.state.settings,date)}:this.state.settings;}
+layout(date){return layoutForDate(this.state.layout,date);}
 waitlist(){return this.state.waitlist||[];}
 enqueue(...args){return this.change('enqueue',args);}
 removeWaiting(...args){return this.change('removeWaiting',args);}

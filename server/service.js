@@ -1,4 +1,4 @@
-import {BookingStore,available,channelNames,validate,today} from '../booking.js';
+import {BookingStore,available,channelNames,validate,today,capacityForDate,bookingDates,fits} from '../booking.js';
 import {enqueue,channels} from './notifications.js';
 import {transaction,database} from './db.js';
 export class MemoryStorage{
@@ -9,7 +9,7 @@ removeItem(k){delete this.data[k];}
 }
 export function snapshot(row){const s=new BookingStore(new MemoryStorage(row.data));return {version:row.version,bookings:s.list(),settings:s.settings(),layout:s.layout(),events:s.events(),waitlist:row.data.waitlist||[]};}
 export async function readState(restaurant='recanto'){const r=await database().query(restaurant==='recanto'?'SELECT * FROM recanto_state WHERE id=1':'SELECT * FROM recanto_tenant_state WHERE restaurant_id=$1',restaurant==='recanto'?[]:[restaurant]);if(!r.rowCount)throw Object.assign(Error('Ristorante non trovato.'),{status:404});return snapshot(r.rows[0]);}
-export async function availability(date,people,restaurant='recanto'){if(!/^\d{4}-\d{2}-\d{2}$/.test(date)||!Number.isInteger(people)||people<1||people>30)throw Object.assign(Error('Data o persone non valide.'),{status:400});const state=await readState(restaurant);return {settings:state.settings,slots:available(state.bookings,date,people,state.settings)};}
+export async function availability(date,people,restaurant='recanto'){if(!/^\d{4}-\d{2}-\d{2}$/.test(date)||!Number.isInteger(people)||people<1||people>30)throw Object.assign(Error('Data o persone non valide.'),{status:400});const state=await readState(restaurant);const settings={...state.settings,capacity:capacityForDate(state.layout,state.settings,date)};return {settings,slots:available(state.bookings,date,people,settings).filter(time=>{const b={date,time,people,duration:settings.duration};return fits(state.bookings,b,Math.min(...bookingDates(b).map(d=>capacityForDate(state.layout,state.settings,d))));})};}
 const publicFields=['first','last','phone','notes','date','time','people','email'];
 export async function mutate(body,admin,restaurant='recanto',actor={username:'owner',role:'superadmin'}){return transaction(async c=>{
 const r=await c.query(restaurant==='recanto'?'SELECT * FROM recanto_state WHERE id=1 FOR UPDATE':'SELECT * FROM recanto_tenant_state WHERE restaurant_id=$1 FOR UPDATE',restaurant==='recanto'?[]:[restaurant]);if(!r.rowCount)throw Object.assign(Error('Ristorante non trovato.'),{status:404});const row=r.rows[0];
