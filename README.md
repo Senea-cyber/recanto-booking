@@ -51,3 +51,10 @@ Superamministrazione: https://recanto-booking.vercel.app/superadmin
 App dedicata a operatori/camerieri, notifiche push e promemoria temporizzati restano fasi successive. Il pannello attuale è utilizzabile da browser mobile.
 Lo storico mostra le prenotazioni esistenti; l'audit delle operazioni parte da questa versione e non ricostruisce modifiche precedenti. Per grandi volumi valutare prenotazioni normalizzate, paginazione e archivio separato.
 Il piano Neon è Free; nessun upgrade attivato. Restano applicabili le quote gratuite dei servizi e dell'hosting.
+
+## Piantina adattiva e disposizioni giornaliere
+In **Tavoli**, la vista **Tutte le sale** mostra le piantine affiancate su schermi grandi e una sotto l'altra sul telefono. Cerca un cliente per vedere sala, tavolo e orario; scegli il risultato e conferma l'arrivo.
+Prima di modificare scegli **Solo questo giorno** oppure **Modello abituale**. Seleziona un tavolo per cambiare i posti (1–30), forma, orientamento e dimensioni. La lunghezza automatica segue le persone della prenotazione attiva all'orario mostrato; per un gruppo su più tavoli mostra la quota di persone su ciascuno e i riferimenti del gruppo. Puoi anche trascinare il quadratino nell'angolo per ridimensionare manualmente.
+Le disposizioni del giorno sono conservate separatamente dal modello abituale. Posti ridotti sono verificati contro prenotazioni assegnate, coperti complessivi e soggiorni a cavallo della mezzanotte. La capienza online non viene alzata automaticamente oltre il limite generale delle Impostazioni.
+La disposizione giornaliera vale per l'intera giornata, mentre nomi e occupazione cambiano con l'orario selezionato. La lunghezza grafica non assegna automaticamente tavoli ai clienti: assegna un tavolo o più tavoli dalla prenotazione, dopo aver verificato la disposizione reale.
+Verifiche aggiuntive: `node --test test/adaptive.test.mjs` (4 test), `node test/adaptive.browser.mjs` (browser in cloud, database isolato). I test di integrazione sono ora 19.
