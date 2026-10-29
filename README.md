@@ -58,3 +58,9 @@ Prima di modificare scegli **Solo questo giorno** oppure **Modello abituale**. S
 Le disposizioni del giorno sono conservate separatamente dal modello abituale. Posti ridotti sono verificati contro prenotazioni assegnate, coperti complessivi e soggiorni a cavallo della mezzanotte. La capienza online non viene alzata automaticamente oltre il limite generale delle Impostazioni.
 La disposizione giornaliera vale per l'intera giornata, mentre nomi e occupazione cambiano con l'orario selezionato. La lunghezza grafica non assegna automaticamente tavoli ai clienti: assegna un tavolo o più tavoli dalla prenotazione, dopo aver verificato la disposizione reale.
 Verifiche aggiuntive: `node --test test/adaptive.test.mjs` (4 test), `node test/adaptive.browser.mjs` (browser in cloud, database isolato). I test di integrazione sono ora 19.
+
+## Collegamenti social e Google
+La sezione **Social e Google** nel pannello genera link per sede con parametri restaurant e src per Facebook, Instagram, Maps e campagne Google. I link sono copiabili e apribili; i conteggi indicano prenotazioni online ricevute nell’archivio, comprese le cancellazioni, non clic o visite. Il canale indica il link usato e può essere condiviso altrove.
+I collegamenti vanno pubblicati dal gestore dei rispettivi profili. La generazione dei link non configura automaticamente account Meta/Google, non attiva campagne e non importa messaggi privati. Nessun abbonamento aggiuntivo viene attivato.
+
+I profili pubblici Facebook, Instagram e Google Maps sono configurabili per ciascun ristorante dal superamministratore, nella sezione Social e Google dei ristoranti. Il responsabile può modificarli dal pannello della propria sede. Vengono salvati nel database con controllo di ruolo e versione; salvare i profili non pubblica automaticamente i link sui servizi esterni.
