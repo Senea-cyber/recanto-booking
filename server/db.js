@@ -15,6 +15,7 @@ CREATE TABLE IF NOT EXISTS recanto_tenant_state(restaurant_id text PRIMARY KEY R
 CREATE TABLE IF NOT EXISTS recanto_users(id text PRIMARY KEY,username text UNIQUE NOT NULL,password_hash text NOT NULL,role text NOT NULL CHECK(role IN ('manager','operator')),restaurant_id text NOT NULL REFERENCES recanto_restaurants(id),disabled boolean NOT NULL DEFAULT false);
 CREATE TABLE IF NOT EXISTS recanto_audit(id bigserial PRIMARY KEY,restaurant_id text NOT NULL,actor text NOT NULL,action text NOT NULL,booking_id text,at timestamptz NOT NULL DEFAULT now());
 CREATE TABLE IF NOT EXISTS recanto_outbox(id text PRIMARY KEY,restaurant_id text NOT NULL,booking_id text NOT NULL,channel text NOT NULL,recipient text NOT NULL,payload jsonb NOT NULL,status text NOT NULL DEFAULT 'pending',provider_id text,error text,created_at timestamptz NOT NULL DEFAULT now());
+CREATE TABLE IF NOT EXISTS recanto_smtp(restaurant_id text PRIMARY KEY REFERENCES recanto_restaurants(id),config text NOT NULL,enabled boolean NOT NULL DEFAULT false);
 CREATE TABLE IF NOT EXISTS recanto_limits(key text PRIMARY KEY,hits integer NOT NULL,expires_at timestamptz NOT NULL);
 CREATE TABLE IF NOT EXISTS recanto_requests(key text PRIMARY KEY,result jsonb NOT NULL,created_at timestamptz NOT NULL DEFAULT now());
 `);await database().query('INSERT INTO recanto_state(id,data) VALUES(1,$1) ON CONFLICT DO NOTHING',[JSON.stringify({'recanto-booking-demo-v1':[],'recanto-booking-settings-v2':{weekly:defaultWeek().map(day=>({...day,open:false}))}})]);}

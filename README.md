@@ -22,6 +22,10 @@ Variabili server: DATABASE_URL e ADMIN_PASSWORD_HASH per il primo avvio. Il nuov
 Il modello iniziale di tavoli va adattato alla sala reale. Le vecchie demo nel browser non sono importate automaticamente.
 
 ## Notifiche
+Email è il canale predefinito. In /superadmin, sezione **Email dei ristoranti**, selezionare la sede e inserire server SMTP, porta 587 STARTTLS o 465 TLS, mittente, utente e password. Lasciare vuota la password nei successivi salvataggi per mantenerla. Il pulsante Verifica connessione controlla autenticazione e TLS senza inviare email. Il provider può richiedere una password per app; alcuni account con solo OAuth non supportano questa modalità.
+Le configurazioni sono cifrate con AES-256-GCM e vincolate alla sede; la chiave server SETTINGS_ENCRYPTION_KEY è distinta per production/preview, esclusa da Git. Non ruotarla senza ricifrare le configurazioni già salvate. La password non viene restituita dalle API. SMTP accetta solo host pubblici, TLS verificato e porte 465/587. La configurazione è riservata al superamministratore.
+Quando SMTP è abilitato ha precedenza sull'adattatore Resend. Nessuna casella reale è ancora configurata; testare il proprio mittente prima di attivare conferme automatiche.
+
 Variabile server privata `NOTIFICATION_PROVIDERS`: oggetto JSON indicizzato per identificativo ristorante, ad esempio `recanto`. Ogni sede può avere:
 - `email: {apiKey, from}`: Resend, mittente autorizzato.
 - `sms: {sid, token, from}`: Twilio, mittente abilitato.
@@ -34,7 +38,7 @@ Nessun fornitore o piano a pagamento è stato attivato. Gli adattatori sono veri
 ## Pubblicazione e verifiche
 `npm ci && npm run build` copia solo gli asset autorizzati in public/. I sorgenti server, test e configurazioni non vengono pubblicati come file statici.
 - `npm test`: 10 test delle regole di prenotazione.
-- `npm run test:integration`: 17 test di API, concorrenza, autenticazione, isolamento sedi, ruoli, piantina, CSV e notifiche. **Svuota solo il database isolato recanto_test su localhost/127.0.0.1**; il codice rifiuta altri database.
+- `npm run test:integration`: 18 test di API, concorrenza, autenticazione, isolamento sedi, ruoli, piantina, CSV e notifiche. **Svuota solo il database isolato recanto_test su localhost/127.0.0.1**; il codice rifiuta altri database.
 - `node test/features.browser.mjs`: Playwright 1.56.1 installato separatamente, dopo i test di integrazione e con server/dev.mjs su localhost:3000. Modifica esclusivamente i dati di test. Verifica trascinamento/salvataggio, disegno pareti, arrivo cliente, esportazione/storico, preferenze messaggi, superadmin, telefono e larghezza mobile.
 - server/dev.mjs serve esclusivamente per prove isolate in cloud.
 - I test automatici non vanno eseguiti sulla produzione.

@@ -1,7 +1,8 @@
+import {smtpPublic,saveSmtp,verifySmtp} from '../server/smtp.js';
 import {migrate,rateLimit,database,transaction} from '../server/db.js';
 import {verifyPassword,login,logout,digest,currentPasswordHash,changePassword,principal,loginIdentity} from '../server/auth.js';
 import {readState,availability,mutate} from '../server/service.js';
-import {authorizeRestaurant,restaurantExists,overview,manage,audit,customerCsv} from '../server/tenancy.js';
+import {authorizeRestaurant,restaurantExists,overview,manage,audit,customerCsv,requireOwner} from '../server/tenancy.js';
 import {notificationState,enqueue,dispatch} from '../server/notifications.js';
 let ready;
 export default async function handler(req,res){
@@ -17,6 +18,7 @@ if(action==='availability'){const restaurant=requested||'recanto',info=await res
 if(action==='session')return res.json({authenticated:!!actor,actor});
 if(action==='superadmin')return res.json(await overview(actor));
 const restaurant=authorizeRestaurant(actor,requested);await restaurantExists(restaurant);
+if(action==='smtp'){requireOwner(actor);return res.json(await smtpPublic(restaurant));}
 if(action==='audit'){const cursor=Number(url.searchParams.get('cursor')||0);if(!Number.isSafeInteger(cursor)||cursor<0)return res.status(400).json({error:'Cursore non valido.'});return res.json({events:await audit(restaurant,cursor)});}
 if(action==='notifications')return res.json(await notificationState(restaurant));
 if(action==='export'){const state=await readState(restaurant);res.setHeader('Content-Type','text/csv; charset=utf-8');res.setHeader('Content-Disposition','attachment; filename="clienti-'+restaurant+'.csv"');await database().query('INSERT INTO recanto_audit(restaurant_id,actor,action) VALUES($1,$2,$3)',[restaurant,actor.username,'export_customers']);return res.send(customerCsv(state.bookings));}
@@ -29,6 +31,7 @@ if(b.action==='changePassword'){if(!actor)return res.status(401).json({error:'Ac
 if(['createRestaurant','createUser','disableUser'].includes(b.action))return res.json(await manage(actor,b));
 if(b.action==='reserve'||!actor){await rateLimit('booking:'+digest(ip),30,3600);const restaurant=requested||'recanto';await restaurantExists(restaurant);const result=await mutate({...b,action:b.action==='reserve'?'create':b.action},false,restaurant);if(result.notificationId)await dispatch(result.notificationId,restaurant);return res.json({booking:result.booking});}
 const restaurant=authorizeRestaurant(actor,requested);await restaurantExists(restaurant);
+if(['saveSmtp','verifySmtp'].includes(b.action)){requireOwner(actor);await rateLimit('smtp:'+restaurant,20,3600);return res.json(b.action==='saveSmtp'?await saveSmtp(restaurant,b.config||{},actor.username):await verifySmtp(restaurant));}
 if(b.action==='sendNotification'){await rateLimit('send:'+restaurant+':'+actor.username,30,3600);if(typeof b.requestId!=='string'||!/^[-a-zA-Z0-9]{16,80}$/.test(b.requestId))return res.status(400).json({error:'Identificativo richiesta non valido.'});const state=await readState(restaurant),booking=state.bookings.find(x=>x.id===b.bookingId);if(!booking)return res.status(404).json({error:'Prenotazione non trovata.'});const id=restaurant+':manual:'+b.requestId;await transaction(c=>enqueue(c,restaurant,booking,b.channel||state.settings.notificationChannel||'email',id));return res.json(await dispatch(id,restaurant));}
 const result=await mutate(b,true,restaurant,actor);if(result.notificationId)await dispatch(result.notificationId,restaurant);return res.json(result);
 }catch(e){const status=e.status||(e.code==='23505'?409:e.code?503:400);return res.status(status).json({error:status===503?'Servizio temporaneamente non disponibile. Riprova più tardi.':e.code==='23505'?'Identificativo già utilizzato.':e.message});}

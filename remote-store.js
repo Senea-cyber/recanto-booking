@@ -1,5 +1,5 @@
 export async function request(body,query=''){
-const params=new URLSearchParams(query);const restaurant=new URLSearchParams(location.search).get('restaurant');if(restaurant&&!params.has('restaurant'))params.set('restaurant',restaurant);
+const params=new URLSearchParams(query);const restaurant=body?.restaurant||new URLSearchParams(location.search).get('restaurant');if(restaurant&&!params.has('restaurant'))params.set('restaurant',restaurant);
 const r=await fetch('/api/booking?'+params,{method:body?'POST':'GET',credentials:'same-origin',cache:'no-store',headers:body?{'Content-Type':'application/json'}:{},body:body?JSON.stringify(body):undefined});
 const data=await r.json();if(!r.ok)throw Object.assign(Error(data.error||'Operazione non riuscita.'),{status:r.status});return data;}
 export class RemoteStore{
