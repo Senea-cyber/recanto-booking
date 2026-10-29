@@ -1,38 +1,49 @@
 # Recanto Booking
 
-Applicazione per una sede con prenotazioni condivise in PostgreSQL, area amministratore autenticata e gestione sala.
+Prenotazioni condivise in PostgreSQL con accesso protetto e gestione di più ristoranti.
 
-## Architettura
-- Interfaccia italiana: prenotazioni pubbliche, agenda, schema tavoli, sale e posti configurabili, giorni/orari, chiusure per servizio, walk-in, lista d'attesa e riconferme manuali.
-- API Vercel `/api/booking`; PostgreSQL Neon in regione Francoforte.
-- Stato centrale JSONB versionato: transazione con `SELECT FOR UPDATE` prima di validare e salvare. Capienza e conflitti tavoli sono verificati sul server. Le modifiche amministrative obsolete ricevono 409.
-- Sessioni casuali di otto ore nel database (token memorizzati come hash), cookie Secure/HttpOnly/SameSite=Strict, verifica Origin, password scrypt, limite dei tentativi e logout revocabile.
-- Dati dei clienti restituiti solo alle sessioni amministratore; API pubblica restituisce disponibilità senza elenco clienti. Il canale src Facebook/Instagram/Google/Maps resta disponibile.
-- Lista d'attesa senza occupazione posti; promozione a prenotazione atomica e subordinata alla disponibilità.
-- Riconferme gestite dal personale: nessun SMS, WhatsApp o email automatico.
+## Funzioni
+- Agenda, disponibilità, capienza, giorni/orari, chiusure, walk-in, lista d'attesa e tracking provenienza social.
+- Piantina riservata al personale: tavoli trascinabili e spostabili con pulsanti, forme, pareti e ingressi disegnabili, salvataggio condiviso. Nomi e stato dei clienti per orario; conferma arrivo/uscita dal tavolo. Sale, nomi tavoli e posti restano configurabili dalle impostazioni del responsabile.
+- Prenotazione telefonica con suggerimenti degli orari disponibili, controlli di capienza e conflitti eseguiti anche dal server.
+- Clienti: ricerca, cronologia prenotazioni, esportazione CSV e registro delle operazioni da questa versione.
+- /superadmin: creazione ristoranti, utenti responsabili/operatori, disattivazione accessi e ingresso nei pannelli delle sedi. Le nuove sedi partono senza prenotazioni e con calendario chiuso.
+- Conferme manuali o automatiche alla creazione, canale predefinito email/SMS/WhatsApp e registro esiti. Gli invii sono disattivati finché non viene collegato un fornitore.
 
-## Configurazione
-Variabili server Vercel: `DATABASE_URL` e `ADMIN_PASSWORD_HASH` (salt esadecimale di 16 byte, due punti, hash scrypt di 64 byte). Nessuna credenziale in Git.
-Database production e preview distinti tramite branch Neon. Il cambio password dall'area amministratore salva il nuovo hash nel database e invalida le altre sessioni; il valore in database prevale sull'hash iniziale.
-Il primo avvio crea tabelle senza sovrascrivere dati. Un nuovo archivio parte senza prenotazioni e con tutti i giorni chiusi online: configurare prima sale, tavoli, capienza e calendario dal pannello.
-Le impostazioni iniziali dei tavoli sono un modello da adattare alla sala reale. I dati delle vecchie demo nel browser non vengono cancellati né importati automaticamente: non costituiscono prenotazioni ricevute dal ristorante.
+## Accessi e separazione
+L'account preesistente è il superamministratore, nome utente `owner`, con password invariata. I nuovi utenti sono assegnati a una sola sede. Il responsabile configura il ristorante; l'operatore gestisce prenotazioni, piantina e clienti ma non modifica calendario, capienza o impostazioni generali.
+Le API verificano ruolo e sede sul server. I link delle sedi usano `?restaurant=identificativo`, anche sulla pagina pubblica. Il parametro non concede accesso ai dati di un altro ristorante.
+Sessioni di otto ore con token memorizzati come hash, cookie Secure/HttpOnly/SameSite=Strict, verifica Origin, password scrypt, limite tentativi e revoca al cambio password/disattivazione.
 
-## Pubblicazione
-`npm ci && npm run build` copia solo i sei asset pubblici in `public/`. Vercel pubblica l'API separatamente e non espone i sorgenti server, test o file di configurazione.
+## Database
+API Vercel /api/booking, PostgreSQL Neon in Francoforte. Stato JSONB versionato per sede e SELECT FOR UPDATE prima della validazione: richieste contemporanee non superano la capienza, modifiche amministrative obsolete ricevono 409.
+Le migrazioni sono additive e non sovrascrivono l'archivio esistente. Recanto mantiene la propria riga originale; le altre sedi usano righe separate. Audit, utenti e coda messaggi sono tabelle dedicate.
+Variabili server: DATABASE_URL e ADMIN_PASSWORD_HASH per il primo avvio. Il nuovo hash salvato nel database prevale sul valore iniziale. Database preview e production separati.
+Il modello iniziale di tavoli va adattato alla sala reale. Le vecchie demo nel browser non sono importate automaticamente.
+
+## Notifiche
+Variabile server privata `NOTIFICATION_PROVIDERS`: oggetto JSON indicizzato per identificativo ristorante, ad esempio `recanto`. Ogni sede può avere:
+- `email: {apiKey, from}`: Resend, mittente autorizzato.
+- `sms: {sid, token, from}`: Twilio, mittente abilitato.
+- `whatsapp: {sid, token, from, contentSid}`: Twilio WhatsApp, template approvato con variabili 1 nome, 2 data, 3 ora, 4 persone, 5 stato.
+
+Non inserire credenziali nel repository o nel browser. Configurarle solo nelle variabili protette Vercel. SMS/WhatsApp richiedono numero internazionale +39...; email richiede l'indirizzo nella prenotazione.
+Ogni invio passa da una coda persistente e viene acquisito una volta. “accepted” significa accettato dal fornitore, non consegnato. Esiti incerti vanno verificati prima di ripetere l'invio. Non sono presenti webhook di consegna, retry automatici o promemoria programmati; restano disponibili le riconferme manuali.
+Nessun fornitore o piano a pagamento è stato attivato. Gli adattatori sono verificati con risposte simulate; l'invio reale richiede configurazione e prova autorizzata del mittente. La gratuità di SMS/WhatsApp non è garantita.
+
+## Pubblicazione e verifiche
+`npm ci && npm run build` copia solo gli asset autorizzati in public/. I sorgenti server, test e configurazioni non vengono pubblicati come file statici.
+- `npm test`: 10 test delle regole di prenotazione.
+- `npm run test:integration`: 17 test di API, concorrenza, autenticazione, isolamento sedi, ruoli, piantina, CSV e notifiche. **Svuota solo il database isolato recanto_test su localhost/127.0.0.1**; il codice rifiuta altri database.
+- `node test/features.browser.mjs`: Playwright 1.56.1 installato separatamente, dopo i test di integrazione e con server/dev.mjs su localhost:3000. Modifica esclusivamente i dati di test. Verifica trascinamento/salvataggio, disegno pareti, arrivo cliente, esportazione/storico, preferenze messaggi, superadmin, telefono e larghezza mobile.
+- server/dev.mjs serve esclusivamente per prove isolate in cloud.
+- I test automatici non vanno eseguiti sulla produzione.
+
 Repository: https://github.com/Senea-cyber/recanto-booking
-Sito: https://recanto-booking.vercel.app/admin
+Amministrazione: https://recanto-booking.vercel.app/admin
+Superamministrazione: https://recanto-booking.vercel.app/superadmin
 
-## Test
-- `npm test`: regole originali di disponibilità, tavoli, calendario, capienza e canali.
-- `npm run test:integration`: database PostgreSQL dedicato **esclusivamente ai test**. Il test accetta solo il database recanto_test su localhost/127.0.0.1; svuota le tabelle recanto_* del database indicato. Non eseguire su database production o preview con dati da conservare.
-- `TEST_PASSWORD=... node test/browser.mjs`: Playwright 1.56.1 installato separatamente, ambiente test isolato. Verifica login, impostazioni, attesa/promozione, cancellazione, logout, prenotazione online, Instagram, schema sale e larghezza mobile. Il test modifica dati: non usarlo in produzione.
-- `server/dev.mjs` è esclusivamente un server per test in cloud, mai il server di produzione.
-
-## Limiti e prossimi interventi
-La piantina è uno schema per sala, senza coordinate o trascinamento. Promemoria automatici e messaggistica non sono collegati. L'amministrazione usa un account condiviso: ruoli per dipendente e storico completo delle modifiche sono evoluzioni successive. Lo stato JSONB viene serializzato per sede; valutare tabelle normalizzate e archivio separato quando cresceranno volume e numero di sedi.
-Il piano Neon dell'organizzazione è Free: nessun piano a pagamento attivato. Restano applicabili le quote gratuite dei servizi e dell'hosting.
-
-## Riferimenti funzionali
-- [Top Food](https://topfood.app/it/sistema-prenotazioni-ristorante-gratis): semplicità della prenotazione diretta e capienza contemporanea.
-- [easyTable](https://easytable.com/it/caratteristiche/): agenda, elenco e vista tavoli.
-- [tablesat](https://tablesat.com/it/pricing): walk-in e organizzazione della sala; i messaggi automatici risultano indicati come funzioni in arrivo nella pagina consultata.
+## Limiti e passi successivi
+App dedicata a operatori/camerieri, notifiche push e promemoria temporizzati restano fasi successive. Il pannello attuale è utilizzabile da browser mobile.
+Lo storico mostra le prenotazioni esistenti; l'audit delle operazioni parte da questa versione e non ricostruisce modifiche precedenti. Per grandi volumi valutare prenotazioni normalizzate, paginazione e archivio separato.
+Il piano Neon è Free; nessun upgrade attivato. Restano applicabili le quote gratuite dei servizi e dell'hosting.
