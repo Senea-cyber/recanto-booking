@@ -25,3 +25,5 @@
 @media(max-width:700px){.room-maps.all-rooms{grid-template-columns:1fr}.room-map{padding:8px}.room-map svg{min-width:540px}.floor-tools .field{width:100%}}
 
 .floor-overview:has(.all-rooms){grid-template-columns:minmax(0,1fr)}.floor-overview:has(.all-rooms) #floor-detail{position:static;max-height:none}.room-maps.all-rooms svg{min-width:0}@media(max-width:700px){.room-maps.all-rooms svg{min-width:540px}}
+
+.social-link-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}.social-link-grid .panel{min-width:0}.social-link-grid input{width:100%;min-width:0}@media(max-width:700px){.social-link-grid{grid-template-columns:1fr}}
